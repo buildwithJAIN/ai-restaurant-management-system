@@ -1,0 +1,75 @@
+<app-loader [show]="loading"></app-loader>
+
+<!-- Header -->
+<div class="header">
+    <h2>Table Management</h2>
+    <button class="create-btn" (click)="openModal()">+ Create Table</button>
+</div>
+
+<!-- Table List -->
+<div class="table-scroll">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Table #</th>
+                <th>Capacity</th>
+                <th>Available</th>
+                <th>Assigned Waiter</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let t of tables()" (click)="onRowClick(t)">
+                <td>{{ t.tableNumber }}</td>
+                <td>{{ t.capacity }}</td>
+                <td>
+                    <span class="status" [class.available]="t.available" [class.unavailable]="!t.available">
+                        {{ t.available ? 'Yes' : 'No' }}
+                    </span>
+                </td>
+                <td>
+                    {{ t.waiter?.firstName }} {{ t.waiter?.lastName }}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal -->
+<div class="modal" *ngIf="showModal()">
+    <div class="modal-content">
+        <h3>{{ editingId() ? 'Edit Table' : 'Create Table' }}</h3>
+
+        <form [formGroup]="form">
+            <!-- Table Number -->
+            <label>Table Number</label>
+            <input formControlName="tableNumber" placeholder="T01" />
+
+            <!-- Capacity -->
+            <label>Capacity</label>
+            <input type="number" formControlName="capacity" min="1" />
+
+            <!-- Availability Checkbox -->
+            <div class="checkbox-row">
+                <input type="checkbox" id="available" formControlName="available" />
+                <label for="available">Available</label>
+            </div>
+
+            <!-- Waiter Dropdown -->
+            <label>Assign Waiter</label>
+            <select formControlName="assignedWaiterId">
+                <option value="" disabled>Select Waiter</option>
+                <option *ngFor="let w of waiters()" [value]="w.id">
+                    {{ w.firstName }} {{ w.lastName }}
+                </option>
+            </select>
+
+            <!-- Actions -->
+            <div class="actions">
+                <button type="button" class="cancel-btn" (click)="showModal.set(false); editingId.set(null)">
+                    Cancel
+                </button>
+                <button type="button" class="save-btn" (click)="saveTable()">Save</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,86 @@
+<!-- <app-loader [show]="loading"></app-loader> -->
+<app-loader [show]="loading"></app-loader>
+
+<div class="login-container">
+    <div class="login-card">
+        <div *ngIf="!forgotPasswordMode">
+            <h2>Welcome Back 👋</h2>
+            <p class="subtitle">Sign in to continue managing your restaurant</p>
+
+            <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+                <div class="row">
+                    <div class="field">
+                        <label>Email</label>
+                        <input type="email" [(ngModel)]="identifier" name="identifier" placeholder="Enter your email"
+                            required />
+                    </div>
+                    <div class="field">
+                        <label>Password</label>
+                        <input type="password" [(ngModel)]="password" name="password" placeholder="Enter your password"
+                            required />
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+
+                <p class="footer-text">
+                    <a style="text-decoration: none;color: #9c4f2f;;" (click)="forgotPasswordMode = true">Forgot
+                        password?</a>
+                </p>
+
+                <p class="footer-text">
+                    <a style="text-decoration: none;color: #9c4f2f;;" routerLink="/signup"> Don’t have an account?
+                        Create
+                        one</a>
+                </p>
+            </form>
+        </div>
+        <div *ngIf="forgotPasswordMode">
+            <h2>Reset Password 🔐</h2>
+
+            <!-- STEP 1: USERNAME/EMAIL + OTP ENTRY -->
+            <div *ngIf="!otpVerified">
+                <div class="row">
+                    <div class="field">
+                        <label>Email or Username</label>
+                        <input name="resetIdentifier" [(ngModel)]="resetIdentifier"
+                            placeholder="Enter your registered email or username" required />
+                    </div>
+                </div>
+
+                <div *ngIf="otpSent" class="row">
+                    <div class="field">
+                        <label>Enter OTP</label>
+                        <input name="otp" [(ngModel)]="otp" placeholder="Enter the OTP sent to your email" required />
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <button *ngIf="!otpSent" (click)="onCheckUser()">Send OTP</button>
+                <button *ngIf="otpSent" (click)="onCheckOtp()">Verify OTP</button>
+            </div>
+
+            <!-- STEP 2: PASSWORD RESET (ONLY AFTER OTP VERIFIED) -->
+            <div *ngIf="otpVerified">
+                <div class="row">
+                    <div class="field">
+                        <label>New Password</label>
+                        <input type="password" [(ngModel)]="newPassword" placeholder="Enter new password" required />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="field">
+                        <label>Confirm Password</label>
+                        <input type="password" [(ngModel)]="confirmPassword" placeholder="Confirm new password"
+                            required />
+                    </div>
+                </div>
+
+                <button (click)="onResetPassword()">Change Password</button>
+            </div>
+
+            <p class="footer-text" (click)="forgotPasswordMode = false">Back to Login</p>
+        </div>
+
+    </div>
+</div>

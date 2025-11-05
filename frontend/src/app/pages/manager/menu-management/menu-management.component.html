@@ -1,0 +1,86 @@
+<app-loader [show]="loader"></app-loader>
+
+<div class="menu-container">
+    <div class="menu-header">
+        <h2>Menu Management 🍲</h2>
+        <button class="btn-primary" (click)="openCreate()">+ Create a Menu Item</button>
+    </div>
+
+
+    <!-- Menu Cards -->
+    <div class="menu-grid">
+        <div class="menu-card" *ngFor="let item of items()" (click)="openEdit(item)">
+            <img [src]="item.imageUrl" alt="{{ item.itemName }}" />
+            <p class="item-name">{{ item.itemName }}</p>
+            <button class="delete-icon" (click)="delete(item, $event)">🗑️</button>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" *ngIf="showModal()">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>{{ modalTitle() }}</h3>
+                <button class="close-btn" (click)="showModal.set(false)">✕</button>
+            </div>
+
+            <form [formGroup]="form" (ngSubmit)="save()" class="modal-form">
+                <div class="row">
+                    <div class="field">
+                        <label>Item Name</label>
+                        <input type="text" formControlName="itemName" placeholder="Paneer Butter Masala" required />
+                    </div>
+
+                    <div class="field">
+                        <label>Category</label>
+                        <select formControlName="category">
+                            <option value="">-- Select Category --</option>
+                            <option *ngFor="let cat of categories" [value]="cat.name">{{ cat.name }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="field small">
+                        <label>Price ($)</label>
+                        <input type="number" formControlName="price" step="0.01" required />
+                    </div>
+                    <div class="field small">
+                        <label>Total Items</label>
+                        <input type="number" formControlName="totalAvailable" required />
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>Description</label>
+                    <textarea formControlName="description" placeholder="Short description of the dish"
+                        rows="3"></textarea>
+                </div>
+
+                <div class="upload-row">
+                    <label>Image</label>
+                    <div class="upload-actions">
+                        <button type="button" class="upload-btn" (click)="fileInput.click()" [disabled]="uploading()">
+                            {{ uploading() ? 'Uploading...' : 'Upload Image' }}
+                        </button>
+                        <input #fileInput type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
+                        <img *ngIf="previewUrl()" [src]="previewUrl()" class="preview-img" alt="preview" />
+                    </div>
+                </div>
+
+                <div class="checkbox-row">
+                    <input type="checkbox" id="available" formControlName="available" />
+                    <label for="available">Available</label>
+                </div>
+
+                <div class="footer-buttons">
+                    <button type="button" class="cancel-btn" (click)="showModal.set(false)">
+                        Cancel
+                    </button>
+                    <button type="submit" class="save-btn">
+                        {{ editingId() ? 'Update' : 'Create' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

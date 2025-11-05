@@ -1,0 +1,80 @@
+.app-layout {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    background-color: #fff8f0;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+    /* prevent global page scroll */
+}
+
+/* 🧭 Sidebar (Fixed) */
+app-sidebar {
+    flex: 0 0 240px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100vh;
+    z-index: 10;
+    background: #fff8f0;
+    border-right: 2px solid #f2d6b6;
+    overflow-y: auto;
+    /* allows scroll if sidebar content grows */
+    scrollbar-width: thin;
+    scrollbar-color: #e6732b #fff8f0;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #ff8a3d, #e6732b);
+        border-radius: 10px;
+    }
+}
+
+/* 🧾 Main Content Area */
+.content-area {
+    flex: 1;
+    margin-left: 280px;
+    /* perfectly aligned beside sidebar */
+    height: 100vh;
+    overflow: hidden;
+    /* prevents global scroll */
+    display: flex;
+    flex-direction: column;
+    background: #fff8f0;
+    position: relative;
+    z-index: 1;
+}
+
+/* Inner wrapper for scrollable content */
+.content-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    height: 100%;
+    padding: 32px;
+    /* use padding here instead of .content-area */
+    box-sizing: border-box;
+    color: #5a3921;
+    background: #fff8f0;
+
+    /* Themed scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: #e6732b #fff8f0;
+
+    &::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #ff8a3d, #e6732b);
+        border-radius: 10px;
+    }
+
+    /* For small screens - responsive fix */
+    @media (max-width: 768px) {
+        padding: 16px;
+    }
+}

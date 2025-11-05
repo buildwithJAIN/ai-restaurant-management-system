@@ -1,0 +1,31 @@
+<app-loader [show]="loading"></app-loader>
+
+<div class="sidebar-container">
+    <div class="app-title">Restaurant RMS</div>
+    <div class="role-label">I am {{roleName}} the {{ role }} of this restaurant</div>
+
+    <ul class="nav-list">
+        <li *ngFor="let item of menuItems" [routerLink]="item.route" routerLinkActive="active"
+            (click)="navigate(item.route)" class="nav-item">
+            <span class="nav-label">{{ item.label }}</span>
+        </li>
+    </ul>
+
+    <!-- 🔻 Logout Section -->
+    <div class="logout-section">
+        <button class="logout-btn" (click)="openLogoutModal()">🚪 Logout</button>
+    </div>
+
+    <!-- 🔹 Logout Confirmation Modal -->
+    <div class="logout-modal-backdrop" *ngIf="showLogoutModal">
+        <div class="logout-modal-card">
+            <p class="logout-message">
+                Do you want to log out <strong>{{ role }}</strong>?
+            </p>
+            <div class="logout-buttons">
+                <button class="cancel-btn" (click)="closeLogoutModal()">No</button>
+                <button class="confirm-btn" (click)="logout()">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>

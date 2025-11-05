@@ -1,0 +1,34 @@
+<app-loader [show]="loading"></app-loader>
+
+<div class="completed-container">
+    <h2 class="page-title">Completed Orders ✅</h2>
+
+    <div *ngIf="!loading && orders.length === 0" class="empty-state">
+        <p>No completed orders yet.</p>
+    </div>
+
+    <div class="order-grid" *ngIf="orders.length > 0">
+        <div class="order-card" *ngFor="let order of orders">
+            <div class="order-header">
+                <h3>Table {{ order.table?.tableNumber }}</h3>
+                <p class="waiter">👨‍🍳 Waiter: {{ order.waiter?.firstName }} {{ order.waiter?.lastName }}</p>
+            </div>
+
+            <div class="items-list">
+                <div class="item" *ngFor="let item of order.orderItems">
+                    <img [src]="item.menuItem?.imageUrl" alt="item" />
+                    <div class="info">
+                        <p class="name">{{ item.menuItem?.itemName }}</p>
+                        <p class="qty">Qty: {{ item.quantity }}</p>
+                        <p class="subtotal">Subtotal: ${{ item.subTotal.toFixed(2) }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-footer">
+                <p class="total">Total: ${{ order.totalAmount.toFixed(2) }}</p>
+                <span class="badge">Ready to Serve 🍽️</span>
+            </div>
+        </div>
+    </div>
+</div>

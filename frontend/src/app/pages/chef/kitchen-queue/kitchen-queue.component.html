@@ -1,0 +1,37 @@
+<!-- frontend/src/app/pages/chef/kitchen-queue/kitchen-queue.component.html -->
+<app-loader [show]="loading"></app-loader>
+
+<div class="chef-header">
+    <h2>Kitchen Queue</h2>
+    <p class="muted">New orders awaiting a chef</p>
+</div>
+
+<div class="orders-grid" *ngIf="orders().length; else emptyState">
+    <div class="order-card" *ngFor="let o of orders()">
+        <div class="top">
+            <div class="pill">Table {{ o.table?.tableNumber }}</div>
+            <div class="time">{{ o.createdAt | date:'shortTime' }}</div>
+        </div>
+
+        <div class="items">
+            <div class="row" *ngFor="let it of o.orderItems">
+                <span class="qty">x{{ it.quantity }}</span>
+                <span class="name">{{ it.menuItem?.itemName }}</span>
+                <span class="price">${{ it.subTotal | number:'1.2-2' }}</span>
+            </div>
+        </div>
+
+        <div class="meta">
+            <span>Waiter: {{ o.waiter?.firstName }} {{ o.waiter?.lastName }}</span>
+            <span class="total">Total: ${{ o.totalAmount | number:'1.2-2' }}</span>
+        </div>
+
+        <button class="btn start" (click)="startCooking(o.id)">Start Cooking</button>
+    </div>
+</div>
+
+<ng-template #emptyState>
+    <div class="empty">
+        No pending orders right now.
+    </div>
+</ng-template>

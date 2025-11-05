@@ -1,0 +1,38 @@
+<app-loader [show]="loading"></app-loader>
+
+<div class="settings-container">
+    <h2>Settings</h2>
+
+    <div class="settings-card" (click)="openCategoryModal()">
+        <h3>📂 Category Master</h3>
+        <p>Manage categories for the menu</p>
+    </div>
+</div>
+
+<!-- 🧾 Category Modal -->
+<div class="modal-overlay" *ngIf="showCategoryModal" (click)="closeModal()"></div>
+
+<div class="modal-content" *ngIf="showCategoryModal" (click)="$event.stopPropagation()">
+    <h2 class="modal-title">Category Master</h2>
+
+    <!-- Top 1/3: Create/Edit -->
+    <div class="create-section">
+        <input type="text" placeholder="Enter category name" [(ngModel)]="categoryName" />
+        <button (click)="saveCategory()">
+            {{ editingId ? 'Update' : 'Create' }}
+        </button>
+    </div>
+
+    <hr />
+
+    <!-- Scrollable List -->
+    <div class="category-list">
+        <div class="category-item" *ngFor="let c of categories">
+            <span>{{ c.name }}</span>
+            <div class="actions">
+                <i class="fa fa-edit edit" (click)="editCategory(c)"></i>
+                <i class="fa fa-trash delete" (click)="deleteCategory(c.id)"></i>
+            </div>
+        </div>
+    </div>
+</div>

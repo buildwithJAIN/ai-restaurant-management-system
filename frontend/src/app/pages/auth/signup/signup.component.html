@@ -1,0 +1,81 @@
+<div class="login-container">
+    <div class="login-card">
+        <h2>Create Your Account 🍽️</h2>
+        <p class="subtitle">Join the Restaurant Management family</p>
+
+        <form (ngSubmit)="onSubmit()" #signupForm="ngForm">
+            <!-- Row 1: First & Last Name -->
+            <div class="row">
+                <div class="field">
+                    <label>First Name</label>
+                    <input type="text" [(ngModel)]="formData.firstName" name="firstName"
+                        placeholder="Enter your first name" required />
+                </div>
+                <div class="field">
+                    <label>Last Name</label>
+                    <input type="text" [(ngModel)]="formData.lastName" name="lastName"
+                        placeholder="Enter your last name" required />
+                </div>
+            </div>
+
+            <!-- Row 2: Email & Username -->
+            <div class="row">
+                <div class="field">
+                    <label>Email</label>
+                    <input type="email" [(ngModel)]="formData.email" name="email" placeholder="Enter your email"
+                        required />
+                </div>
+                <div class="field">
+                    <label>Username</label>
+                    <input type="text" [(ngModel)]="formData.username" name="username" placeholder="Enter a username"
+                        required />
+                </div>
+            </div>
+
+            <!-- Row 3: Gender & Role -->
+            <div class="row">
+                <div class="field">
+                    <label>Gender</label>
+                    <select [(ngModel)]="formData.gender" name="gender" required>
+                        <option class="optDef" value="" disabled selected>Select gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Role</label>
+                    <select [(ngModel)]="formData.role" name="role" required>
+                        <option class="optDef" value="" disabled selected>Select role</option>
+                        <option value="host">Host</option>
+                        <option value="waiter">Waiter</option>
+                        <option value="chef">Chef</option>
+                        <option value="manager">Manager</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Row 4: Password fields -->
+            <div class="row">
+                <div class="field">
+                    <label>Password</label>
+                    <input type="password" [(ngModel)]="formData.password" name="password"
+                        placeholder="Create a password" required />
+                </div>
+                <div class="field">
+                    <label>Confirm Password</label>
+                    <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword"
+                        placeholder="Re-enter your password" required />
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-primary">Create Account</button>
+
+            <!-- Footer -->
+            <p class="footer-text">
+                <a routerLink="/login">Already have an account? Login</a>
+            </p>
+        </form>
+    </div>
+</div>

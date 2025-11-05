@@ -1,0 +1,69 @@
+<app-loader [show]="loading"></app-loader>
+
+<div class="tables-page">
+
+    <!-- ✅ Left section – Tables list -->
+    <div class="table-grid">
+        <div class="table-card" *ngFor="let t of tables" (click)="selectTable(t)"
+            [class.active]="selectedTable?.id === t.id">
+            <h3>{{ t.tableNumber }}</h3>
+            <p>Capacity: {{ t.capacity }}</p>
+            <p>
+                Status:
+                <span [ngClass]="t.status === 'Available' ? 'status-available' : 'status-occupied'">
+                    {{ t.status }}
+                </span>
+            </p>
+        </div>
+    </div>
+
+    <!-- ✅ Right section – Order panel -->
+    <div class="order-panel" *ngIf="selectedTable">
+        <div class="order-header">
+            <h2>Take Order - {{ selectedTable.tableNumber }}</h2>
+            <p>Capacity: {{ selectedTable.capacity }}</p>
+        </div>
+
+        <!-- Category tabs -->
+        <div class="categories-wrapper">
+            <div class="categories">
+                <button *ngFor="let cat of categories" (click)="selectCategory(cat)"
+                    [class.active]="selectedCategory?.id === cat.id">
+                    {{ cat.name }}
+                </button>
+            </div>
+        </div>
+
+        <!-- Items list -->
+        <div class="items-container" *ngIf="selectedCategory">
+            <div class="item-card" *ngFor="let item of selectedCategory.items">
+                <div class="item-info">
+                    <h4>{{ item.name }}</h4>
+                    <p class="price">${{ item.price }}</p>
+                    <p class="stock" [ngClass]="{ 'out-of-stock': item.stock === 0 }">
+                        Stock: {{ item.stock }}
+                    </p>
+                </div>
+
+                <div class="counter">
+                    <button (click)="decrement(item)" [disabled]="item.qty === 0">−</button>
+                    <span>{{ item.qty || 0 }}</span>
+                    <button (click)="increment(item)" [disabled]="item.stock === 0">+</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer totals -->
+        <div class="order-footer">
+            <div class="summary">
+                <p>Total Items: <strong>{{ totalItems }}</strong></p>
+                <p>Total Price: <strong>${{ totalPrice | number:'1.2-2' }}</strong></p>
+
+            </div>
+            <div class="actions">
+                <button class="btn confirm" (click)="confirmOrder()">Confirm Order</button>
+                <button class="btn cancel" (click)="clearSelection()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
