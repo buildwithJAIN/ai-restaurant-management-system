@@ -1,15 +1,14 @@
 import { PrismaClient } from "@prisma/client";
-const prims = new PrismaClient()
+const prisma = new PrismaClient();
 
 // ✅ Create order
 export const createOrder = async ({ waiterId, tableId, items, total }) => {
-  // 1️⃣ Create order record
   const order = await prisma.order.create({
     data: {
       waiterId,
       tableId,
       totalAmount: total,
-      status: 'Pending',
+      status: "Pending",
       orderItems: {
         create: items.map((i) => ({
           menuItemId: i.id,
@@ -22,7 +21,6 @@ export const createOrder = async ({ waiterId, tableId, items, total }) => {
     include: { orderItems: true, table: true },
   });
 
-  // 2️⃣ Reduce stock for each ordered menu item
   for (const i of items) {
     await prisma.menuItem.update({
       where: { id: i.id },
@@ -30,10 +28,9 @@ export const createOrder = async ({ waiterId, tableId, items, total }) => {
     });
   }
 
-  // 3️⃣ Update table status to Occupied
   await prisma.table.update({
     where: { id: tableId },
-    data: { status: 'Occupied' },
+    data: { available: true },
   });
 
   return order;
@@ -45,20 +42,60 @@ export const getOrdersByWaiter = async (waiterId) => {
     where: { waiterId },
     include: {
       table: true,
+      chef: { select: { firstName: true, lastName: true } },
       orderItems: { include: { menuItem: true } },
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
   });
 };
 
-// ✅ Fetch orders by table
-export const getOrdersByTable = async (tableId) => {
+// ✅ Fetch in-progress orders by chef
+export const getInProgressOrdersByChef = async (chefId) => {
   return await prisma.order.findMany({
-    where: { tableId },
+    where: { chefId, status: "InProgress" },
     include: {
-      waiter: true,
+      table: true,
+      waiter: { select: { firstName: true, lastName: true } },
       orderItems: { include: { menuItem: true } },
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
+  });
+};
+
+// ✅ Start cooking (assign to chef)
+export const startCookingOrder = async (orderId, chefId) => {
+  return await prisma.order.update({
+    where: { id: orderId },
+    data: { chefId, status: "InProgress" },
+  });
+};
+
+// ✅ Mark order ready
+export const markOrderAsReady = async (orderId) => {
+  return await prisma.order.update({
+    where: { id: orderId },
+    data: { status: "Ready" },
+  });
+};
+
+// ✅ Mark order served
+export const markOrderAsServed = async (orderId) => {
+  return await prisma.order.update({
+    where: { id: orderId },
+    data: { status: "Served" },
+  });
+};
+
+// ✅ Fetch completed orders
+export const getCompletedOrders = async () => {
+  return await prisma.order.findMany({
+    where: { status: "Served" },
+    include: {
+      table: true,
+      waiter: { select: { firstName: true, lastName: true } },
+      chef: { select: { firstName: true, lastName: true } },
+      orderItems: { include: { menuItem: true } },
+    },
+    orderBy: { createdAt: "desc" },
   });
 };

@@ -1,0 +1,25 @@
+<div class="reserve-container">
+    <h2 class="title">Reserve a Table 🍽️</h2>
+
+    <form [formGroup]="reserveForm" (ngSubmit)="submitReservation()">
+        <label>Name</label>
+        <input type="text" formControlName="guestName" placeholder="Your Name" />
+
+        <label>Phone</label>
+        <input type="tel" formControlName="phone" placeholder="Your Phone Number" />
+
+        <label>No. of People</label>
+        <input type="number" formControlName="numPeople" min="1" />
+
+        <label>Date & Time</label>
+        <input type="datetime-local" formControlName="dateTime" />
+
+        <label>Special Requests</label>
+        <textarea formControlName="specialNotes" rows="2" placeholder="Optional"></textarea>
+
+        <button type="submit" [disabled]="submitting">Reserve Table</button>
+    </form>
+
+    <p *ngIf="successMessage" class="success">{{ successMessage }}</p>
+    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+</div>

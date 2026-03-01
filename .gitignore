@@ -1,0 +1,67 @@
+# ==================================================
+# GLOBAL (applies everywhere)
+# ==================================================
+
+# Node dependencies
+node_modules/
+**/node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files (NEVER commit real secrets)
+.env
+.env.*
+*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE / Editors
+.vscode/
+.idea/
+
+# ==================================================
+# FRONTEND (Angular)
+# ==================================================
+
+frontend/dist/
+frontend/.angular/
+frontend/.expo/
+frontend/coverage/
+frontend/.cache/
+frontend/tmp/
+frontend/out-tsc/
+
+# Angular environment files (if used for secrets)
+frontend/src/environments/environment*.ts
+
+# ==================================================
+# BACKEND (Node + Express)
+# ==================================================
+
+backend/dist/
+backend/tmp/
+backend/uploads/
+backend/coverage/
+backend/uploads/
+# Prisma generated files
+backend/.prisma/
+backend/generated/
+
+# Local Prisma DB (if SQLite used)
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+
+
+
+# ==================================================
+# Build artifacts
+# ==================================================
+
+build/
+coverage/

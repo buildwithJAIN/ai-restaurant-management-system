@@ -53,25 +53,30 @@ model Table {
   waiterId    Int?
   waiter      User?    @relation(fields: [waiterId], references: [id])
   available   Boolean  @default(true) // ✅ Added availability flag
+  status      String   @default("Available") // Waiter flow updates this
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  orders Order[]
+  orders       Order[]
+  reservations Reservation[]
+  billings     Billing[]
 }
 
 model Order {
   id          Int      @id @default(autoincrement())
   waiterId    Int
   tableId     Int
-  chefId      Int? // ✅ Added for Chef assignment
+  chefId      Int?
+  billingId   Int? // 🔥 New field: each order belongs to one Billing
   totalAmount Float
   status      String   @default("Pending") // Pending | InProgress | Ready | Served | Paid
   createdAt   DateTime @default(now())
 
-  // ✅ Relations
+  // 🔗 Relations
   waiter     User        @relation("WaiterOrders", fields: [waiterId], references: [id])
   chef       User?       @relation("ChefOrders", fields: [chefId], references: [id])
   table      Table       @relation(fields: [tableId], references: [id])
+  billing    Billing?     @relation(fields: [billingId], references: [id]) // 🔥 Newly added relation
   orderItems OrderItem[]
 }
 
@@ -85,10 +90,46 @@ model OrderItem {
 
   order    Order    @relation(fields: [orderId], references: [id])
   menuItem MenuItem @relation(fields: [menuItemId], references: [id])
+  status String @default("InProgress")  // InProgress | Ready | Served
 }
 
 model Category {
   id        Int      @id @default(autoincrement())
   name      String   @unique
   createdAt DateTime @default(now())
+}
+
+model AIPrompt {
+  id        Int      @id @default(autoincrement())
+  type      String   // item_description, menu_import, etc.
+  prompt    String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model Reservation {
+  id           Int      @id @default(autoincrement())
+  guestName    String
+  phone        String
+  numPeople    Int
+  dateTime     DateTime
+  specialNotes String?
+  status       String   @default("Pending") // Pending, Accepted, Rejected
+  preOrders    Json?
+  tableId      Int?
+  table        Table?   @relation(fields: [tableId], references: [id])
+  createdAt    DateTime @default(now())
+}
+
+model Billing {
+  id        Int       @id @default(autoincrement())
+  tableId   Int
+  status    String    @default("Unbilled") // Unbilled | Billed
+  createdAt DateTime  @default(now())
+  closedAt  DateTime?
+
+  table  Table   @relation(fields: [tableId], references: [id])
+  orders Order[]
 }

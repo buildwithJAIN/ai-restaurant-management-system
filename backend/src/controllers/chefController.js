@@ -16,7 +16,7 @@ export const getPendingOrders = async (req, res) => {
         waiter: { select: { firstName: true, lastName: true } },
         orderItems: {
           include: {
-            menuItem: { select: { itemName: true } }
+            menuItem: { select: { itemName: true,imageUrl:true } }
           }
         }
       }
@@ -77,31 +77,91 @@ export const startCooking = async (req, res) => {
  * Orders currently assigned to this chef
  */
 
+// Get in-progress orders for a particular chef
 export const getChefInProgressOrders = async (req, res) => {
   try {
-    const { id } = req.params; // chefId from route param
+  const chefId = parseInt(req.params.chefId);
 
-    const orders = await prisma.order.findMany({
+  const orders = await prisma.order.findMany({
+    where: {
+      status: "InProgress",
+      chefId: chefId,
+    },
+    include: {
+      table: { select: { tableNumber: true } },
+      waiter: { select: { firstName: true, lastName: true } },
+      orderItems: {
+        where: { status: "InProgress" }, // ⭐ ONLY items still being prepared
+        include: {
+          menuItem: {
+            select: {
+              itemName: true,
+              imageUrl: true
+            }
+          }
+        }
+      }
+    },
+    orderBy: { createdAt: "desc" }
+  });
+
+  // ⭐ Remove orders that now have 0 items in progress
+  const activeOrders = orders.filter(o => o.orderItems.length > 0);
+
+  res.json(activeOrders);
+
+} catch (err) {
+  console.error("❌ Error fetching in-progress orders:", err);
+  res.status(500).json({ error: "Failed to fetch orders" });
+}
+
+};
+
+export const markItemsReady = async (req, res) => {
+  try {
+    const { orderId, items } = req.body;
+
+    if (!orderId || !items || items.length === 0) {
+      return res.status(400).json({ error: "Order ID and items array required" });
+    }
+
+    // 1️⃣ Update selected items
+    await prisma.orderItem.updateMany({
       where: {
-        status: "InProgress",
-        chefId: parseInt(id), // ✅ show only orders belonging to this chef
+        id: { in: items }
       },
-      include: {
-        table: { select: { tableNumber: true } },
-        waiter: { select: { firstName: true, lastName: true } },
-        orderItems: {
-          include: { menuItem: { select: { itemName: true, imageUrl: true } } },
-        },
-      },
-      orderBy: { createdAt: "desc" },
+      data: {
+        status: "Ready"
+      }
     });
 
-    res.json(orders);
-  } catch (error) {
-    console.error("❌ Error fetching in-progress orders:", error);
-    res.status(500).json({ error: "Failed to fetch in-progress orders" });
+    // 2️⃣ Check if all items for this order are ready
+    const orderItems = await prisma.orderItem.findMany({
+      where: { orderId }
+    });
+
+    const allReady = orderItems.every(i => i.status === "Ready");
+
+    // 3️⃣ If all ready → update order status
+    if (allReady) {
+      await prisma.order.update({
+        where: { id: orderId },
+        data: { status: "Ready" }
+      });
+    }
+
+    res.json({
+      success: true,
+      updatedItems: items.length,
+      orderCompleted: allReady
+    });
+
+  } catch (err) {
+    console.error("❌ markItemsReady Error:", err);
+    res.status(500).json({ error: "Failed to update item status" });
   }
 };
+
 
 
 
@@ -149,7 +209,7 @@ export const markReady = async (req, res) => {
 export const getCompletedOrders = async (req, res) => {
   try {
     const orders = await prisma.order.findMany({
-      where: { status: "Ready" },
+      where: { status: { in: ["Ready", "Served", "Billed","Unbilled"] } },
       include: {
         table: { select: { tableNumber: true } },
         waiter: { select: { firstName: true, lastName: true } },

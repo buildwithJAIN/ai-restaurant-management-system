@@ -15,7 +15,7 @@ export class MenuService {
 
     /** 🟢 Get all menu items */
     list(): Observable<MenuItem[]> {
-        return this.http.get<MenuItem[]>(this.base);
+        return this.http.get<MenuItem[]>(this.apiUrl);
     }
 
     /** 🟢 Create a new menu item */
@@ -24,13 +24,15 @@ export class MenuService {
     }
 
     update(id: number, data: FormData) {
-        return this.http.put<MenuItem>(`/api/menu/${id}`, data);
+        return this.http.put<MenuItem>(`${this.apiUrl}/${id}`, data);
     }
+
 
 
     /** 🟢 Delete (renamed to match component) */
     remove(id: number): Observable<string> {
-        return this.http.delete(`${this.base}/${id}`, { responseType: 'text' });
+        console.log(id)
+        return this.http.delete(`${this.apiUrl}/${id}`, { responseType: 'text' });
     }
 
     /** 🟢 Upload image file and get back URL */

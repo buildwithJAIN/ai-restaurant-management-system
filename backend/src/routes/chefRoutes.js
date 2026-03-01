@@ -4,7 +4,7 @@ import {
   startCooking,
   getChefInProgressOrders, // 👈 this one’s new
   markReady,
-  getCompletedOrders
+  getCompletedOrders, markItemsReady
 } from "../controllers/chefController.js";
 
 const router = express.Router();
@@ -18,5 +18,7 @@ router.get("/orders/in-progress/:chefId", getChefInProgressOrders);
 
 router.patch("/orders/ready/:orderId", markReady);
 router.get("/orders/completed", getCompletedOrders);
+router.patch('/orders/mark-items-ready', markItemsReady);
+
 
 export default router;

@@ -140,4 +140,8 @@ export class TableManagementComponent implements OnInit {
       available: table.available
     });
   }
+
+  refreshTables() {
+    this.loadTables()
+  }
 }

@@ -1,0 +1,11 @@
+<div class="modal-overlay" *ngIf="visible">
+    <div class="modal-box">
+        <h3 class="modal-title">{{ title }}</h3>
+        <p class="modal-message">{{ message }}</p>
+
+        <div class="modal-buttons">
+            <button class="btn yes" (click)="confirm()">Yes</button>
+            <button class="btn no" (click)="cancel()">No</button>
+        </div>
+    </div>
+</div>

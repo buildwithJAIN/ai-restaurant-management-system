@@ -2,29 +2,60 @@
 
 <div class="tables-page">
 
-    <!-- ✅ Left section – Tables list -->
+    <!-- LEFT: TABLE CARDS -->
     <div class="table-grid">
         <div class="table-card" *ngFor="let t of tables" (click)="selectTable(t)"
             [class.active]="selectedTable?.id === t.id">
-            <h3>{{ t.tableNumber }}</h3>
+
+            <h3>Table {{ t.tableNumber }}</h3>
             <p>Capacity: {{ t.capacity }}</p>
+
+            <!-- BILLING STATUS -->
             <p>
                 Status:
-                <span [ngClass]="t.status === 'Available' ? 'status-available' : 'status-occupied'">
-                    {{ t.status }}
+                <span class="badge" [ngClass]="t.activeBilling ? 'occupied' : 'available'">
+                    {{ t.activeBilling ? 'Occupied' : 'Available' }}
                 </span>
             </p>
+
+            <!-- ACTIVE BILLING INFO -->
+            <div *ngIf="t.activeBilling" class="order-summary">
+                <p><strong>Billing ID: </strong>{{ t.activeBilling.billingId }}</p>
+                <p><strong>Orders:</strong> {{ t.activeBilling.totalOrders }}</p>
+            </div>
+
+            <!-- CONTINUE ORDER -->
+            <button class="continue-btn" *ngIf="t.currentOrder" (click)="continueOrder(t); $event.stopPropagation()">
+                Continue Order
+            </button>
+
+            <!-- START NEW ORDER -->
+            <button class="start-btn" *ngIf="!t.currentOrder" (click)="startOrder(t); $event.stopPropagation()">
+                Start Order
+            </button>
         </div>
     </div>
 
-    <!-- ✅ Right section – Order panel -->
+    <!-- ======================================================
+         RIGHT SIDE: ORDER PANEL
+    ====================================================== -->
     <div class="order-panel" *ngIf="selectedTable">
-        <div class="order-header">
-            <h2>Take Order - {{ selectedTable.tableNumber }}</h2>
-            <p>Capacity: {{ selectedTable.capacity }}</p>
+
+        <div class="order-header-row">
+            <div class="left">
+                <h2>Order - Table {{ selectedTable.tableNumber }}</h2>
+                <span class="capacity-badge">
+                    Capacity: {{ selectedTable.capacity }}
+                </span>
+            </div>
+
+            <!-- SHOW EXISTING FULL ORDER -->
+            <button class="view-order-btn" *ngIf="existingItems.length > 0" (click)="openExistingOrderModal()">
+                View Full Order
+            </button>
         </div>
 
-        <!-- Category tabs -->
+        <!-- CATEGORY TABS -->
         <div class="categories-wrapper">
             <div class="categories">
                 <button *ngFor="let cat of categories" (click)="selectCategory(cat)"
@@ -34,9 +65,10 @@
             </div>
         </div>
 
-        <!-- Items list -->
+        <!-- MENU ITEMS -->
         <div class="items-container" *ngIf="selectedCategory">
             <div class="item-card" *ngFor="let item of selectedCategory.items">
+
                 <div class="item-info">
                     <h4>{{ item.name }}</h4>
                     <p class="price">${{ item.price }}</p>
@@ -50,20 +82,51 @@
                     <span>{{ item.qty || 0 }}</span>
                     <button (click)="increment(item)" [disabled]="item.stock === 0">+</button>
                 </div>
+
             </div>
         </div>
 
-        <!-- Footer totals -->
+        <!-- ORDER FOOTER -->
         <div class="order-footer">
             <div class="summary">
-                <p>Total Items: <strong>{{ totalItems }}</strong></p>
-                <p>Total Price: <strong>${{ totalPrice | number:'1.2-2' }}</strong></p>
-
+                <p>Total New Items: <strong>{{ totalItems }}</strong></p>
+                <p>Total New Price: <strong>${{ totalPrice | number:'1.2-2' }}</strong></p>
             </div>
+
             <div class="actions">
-                <button class="btn confirm" (click)="confirmOrder()">Confirm Order</button>
+                <button class="btn confirm" (click)="submitOrder()">
+                    {{ isContinuing ? 'Update Order' : 'Confirm Order' }}
+                </button>
                 <button class="btn cancel" (click)="clearSelection()">Cancel</button>
             </div>
         </div>
+
     </div>
+
+</div>
+
+
+<!-- ======================================================
+     MODAL: EXISTING ORDER DETAILS
+====================================================== -->
+<div class="modal-backdrop" *ngIf="showExistingModal" (click)="closeExistingOrderModal()"></div>
+
+<div class="existing-modal" *ngIf="showExistingModal">
+    <h3>Existing Order</h3>
+
+    <div class="modal-items">
+        <div class="modal-item" *ngFor="let e of existingItems">
+            <span class="name">{{ e.menuItemName }}</span>
+            <span class="qty">x {{ e.quantity }}</span>
+            <span class="price">
+                ${{ e.subTotal || (e.price * e.quantity) }}
+            </span>
+        </div>
+    </div>
+
+    <div class="modal-total">
+        Total: <strong>${{ calculateExistingOrderTotal() }}</strong>
+    </div>
+
+    <button class="close-btn" (click)="closeExistingOrderModal()">Close</button>
 </div>

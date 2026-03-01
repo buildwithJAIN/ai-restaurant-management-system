@@ -7,13 +7,35 @@
     color: #9c4f2f;
     background: #fdfaf6;
     height: 100vh;
-    /* occupy full viewport height */
     box-sizing: border-box;
     overflow: hidden;
-    /* prevent page scroll */
 }
 
-// 🧾 Header
+/* ============================
+   🟢 TABLE STATUS BADGES
+================================ */
+.table-status {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block;
+    text-align: center;
+}
+
+.table-status.occupied {
+    background: #ffe6e6;
+    color: #e74c3c;
+}
+
+.table-status.unoccupied {
+    background: #e9f9ef;
+    color: #27ae60;
+}
+
+/* ============================
+   🟤 Header
+================================ */
 .header {
     display: flex;
     justify-content: space-between;
@@ -43,7 +65,9 @@
     }
 }
 
-/* 🧾 Scrollable area for table */
+/* ============================
+   🟫 Scroll container
+================================ */
 .table-scroll {
     flex: 1;
     overflow-y: auto;
@@ -54,7 +78,6 @@
     padding: 1rem;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 
-    /* Themed scrollbar */
     &::-webkit-scrollbar {
         width: 10px;
     }
@@ -77,7 +100,9 @@
     scrollbar-width: thin;
 }
 
-// 🍽 Table list
+/* ============================
+   🟤 TABLE LIST
+================================ */
 .data-table {
     width: 100%;
     border-collapse: collapse;
@@ -88,7 +113,10 @@
     th,
     td {
         padding: 0.9rem 1.2rem;
-        text-align: left;
+        text-align: center !important;
+        /* 🟢 Center everything */
+        vertical-align: middle !important;
+        /* 🟢 Align vertically */
     }
 
     thead {
@@ -106,6 +134,8 @@
     }
 
     tbody tr {
+        height: 58px;
+        /* 🟢 Perfect row height */
         border-bottom: 1px solid #f0e8da;
         cursor: pointer;
         transition: background 0.2s;
@@ -120,15 +150,15 @@
         color: #3d3d3d;
     }
 
-    // 🟢 Availability badges
+    /* 🟢 Availability badges */
     .status {
         padding: 0.25rem 0.8rem;
         border-radius: 999px;
         font-weight: 600;
         font-size: 0.85rem;
         display: inline-block;
+        min-width: 70px;
         text-align: center;
-        min-width: 60px;
 
         &.available {
             background: #d8f3dc;
@@ -144,7 +174,17 @@
     }
 }
 
-// 🪟 Modal
+.disabled-row {
+    opacity: 0.6;
+    cursor: not-allowed !important;
+    pointer-events: none; // Disables clicking the row
+    user-select: none; // Prevents text selection
+}
+
+
+/* ============================
+   📦 MODAL
+================================ */
 .modal {
     position: fixed;
     inset: 0;
@@ -200,7 +240,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-top: -4px;
 
             input {
                 width: 18px;
@@ -250,7 +289,7 @@
     }
 }
 
-// ✨ Pop-in animation
+/* Modal animation */
 @keyframes pop {
     from {
         transform: scale(0.9);
@@ -260,5 +299,54 @@
     to {
         transform: scale(1);
         opacity: 1;
+    }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* REFRESH BUTTON STYLING */
+.refresh-btn {
+    background: #f3e7dd;
+    border: 1px solid #d3b49c;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #8c4b2f;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    transition: 0.2s ease-in-out;
+
+    &:hover {
+        background: #e8d8cb;
+    }
+
+    i {
+        font-size: 18px;
+    }
+}
+
+/* CREATE BUTTON (your existing style) */
+.create-btn {
+    background: #b85c38;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+
+    &:hover {
+        background: #a44f32;
     }
 }

@@ -5,6 +5,15 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { LoaderComponent } from '../../../components/loader/loader.component';
 
+// Proper typing for existing order items
+type ExistingItem = {
+  menuItemId: number;
+  menuItemName: string;
+  price: number;
+  quantity: number;
+  subTotal?: number;
+};
+
 @Component({
   selector: 'app-waiter-tables',
   standalone: true,
@@ -13,17 +22,24 @@ import { LoaderComponent } from '../../../components/loader/loader.component';
   styleUrls: ['./my-tables.component.scss']
 })
 export class WaiterTablesComponent implements OnInit {
+
   waiterId: number = 0;
   tables: any[] = [];
   selectedTable: any = null;
 
-  loading: boolean = false;
+  loading = false;
 
-  // 🧾 Menu & order data
+  // ORDER STATES
   categories: any[] = [];
   selectedCategory: any = null;
-  totalItems: number = 0;
+
+  existingItems: ExistingItem[] = [];     // previous order items
+  isContinuing = false;
+
+  totalItems: number = 0;        // new items only
   totalPrice: number = 0;
+
+  showExistingModal = false;     // for popup modal
 
   private apiBase = 'http://localhost:5000/api';
 
@@ -35,38 +51,60 @@ export class WaiterTablesComponent implements OnInit {
     this.loadTables();
   }
 
-  // 🟢 Load tables assigned to this waiter
+  /* ============================================================
+     LOAD TABLES
+  ============================================================ */
   loadTables() {
     this.loading = true;
     this.http.get(`${this.apiBase}/tables/waiter/${this.waiterId}`).subscribe({
       next: (res: any) => {
-        this.tables = res;
+        console.log(res);
+        // ⬇️ keep previous behaviour: only show available tables
+        this.tables = res && res.filter((x: any) => x.available == true);   // includes currentOrder
       },
-      error: (err) => console.error('❌ Error loading tables', err),
+      error: err => console.error('❌ Error loading tables', err),
       complete: () => (this.loading = false)
     });
   }
 
-  // 🟠 When a table card is clicked
-  selectTable(table: any) {
+  /* ============================================================
+     TABLE ACTIONS
+  ============================================================ */
+
+  startOrder(table: any) {
     this.selectedTable = table;
+    this.existingItems = [];
+    this.isContinuing = false;
+    this.showExistingModal = false;
     this.fetchCategories();
   }
 
-  // 🧾 Fetch menu categories and items
+  continueOrder(table: any) {
+    this.selectedTable = table;
+    this.isContinuing = true;
+    this.existingItems = table.currentOrder?.items || [];
+    this.showExistingModal = false;
+    this.fetchCategories();
+  }
+
+  selectTable(table: any) {
+    if (table.currentOrder) this.continueOrder(table);
+    else this.startOrder(table);
+  }
+
+  /* ============================================================
+     MENU CATEGORIES
+  ============================================================ */
+
   fetchCategories() {
     this.loading = true;
-    this.http.get<any[]>(`${this.apiBase}/menu`).subscribe({
-      next: (res) => {
-        if (!Array.isArray(res)) {
-          console.error('❌ Invalid menu response:', res);
-          this.loading = false;
-          return;
-        }
 
+    this.http.get<any[]>(`${this.apiBase}/menu`).subscribe({
+      next: res => {
         const grouped = res.reduce((acc: any, item: any) => {
           const cat = item.category || 'Uncategorized';
           if (!acc[cat]) acc[cat] = [];
+
           acc[cat].push({
             id: item.id,
             name: item.itemName,
@@ -75,6 +113,7 @@ export class WaiterTablesComponent implements OnInit {
             image: item.imageUrl,
             qty: 0
           });
+
           return acc;
         }, {});
 
@@ -85,22 +124,20 @@ export class WaiterTablesComponent implements OnInit {
         }));
 
         this.selectedCategory = this.categories[0] || null;
-        console.log('✅ Categories ready:', this.categories);
       },
-      error: (err) => {
-        console.error('❌ Error fetching menu:', err);
-        alert('Error fetching menu items');
-      },
+      error: () => alert("Error loading menu"),
       complete: () => (this.loading = false)
     });
   }
 
-  // 🔸 Select a category tab
   selectCategory(cat: any) {
     this.selectedCategory = cat;
   }
 
-  // ➕ Increment item
+  /* ============================================================
+     ITEM COUNTING
+  ============================================================ */
+
   increment(item: any) {
     if (item.stock > 0) {
       item.qty++;
@@ -109,7 +146,6 @@ export class WaiterTablesComponent implements OnInit {
     }
   }
 
-  // ➖ Decrement item
   decrement(item: any) {
     if (item.qty > 0) {
       item.qty--;
@@ -118,66 +154,99 @@ export class WaiterTablesComponent implements OnInit {
     }
   }
 
-  // 🔄 Update totals
   updateTotals() {
-    let totalQty = 0;
-    let totalPrice = 0;
+    let qty = 0;
+    let price = 0;
 
     this.categories.forEach(cat => {
-      cat.items.forEach((item: { qty: number; price: number }) => {
-        totalQty += item.qty;
-        totalPrice += item.qty * item.price;
+      cat.items.forEach((i: any) => {
+        qty += i.qty;
+        price += i.qty * i.price;
       });
     });
 
-    this.totalItems = totalQty;
-    // keep two decimals
-    this.totalPrice = parseFloat(totalPrice.toFixed(2));
+    this.totalItems = qty;
+    this.totalPrice = parseFloat(price.toFixed(2));
   }
 
-  // ✅ Confirm order for selected table
-  confirmOrder() {
+  /* ============================================================
+     SUBMIT ORDER
+  ============================================================ */
+
+  submitOrder() {
     const orderedItems = this.categories
       .flatMap(cat => cat.items)
       .filter(i => i.qty > 0);
 
     if (orderedItems.length === 0) {
-      alert('Please select at least one item.');
+      alert("Select at least one item.");
       return;
     }
 
-    const orderPayload = {
+    const payloadItems = orderedItems.map(i => ({
+      menuItemId: i.id,
+      quantity: i.qty,
+      price: i.price
+    }));
+
+    const payload = {
       waiterId: this.waiterId,
       tableId: this.selectedTable.id,
-      items: orderedItems.map(i => ({
-        menuItemId: i.id,
-        quantity: i.qty,
-        price: i.price
-      }))
+      items: payloadItems
     };
 
     this.loading = true;
-    this.http.post(`${this.apiBase}/orders/create`, orderPayload).subscribe({
-      next: (res: any) => {
-        console.log('✅ Order created:', res);
-        alert('✅ Order placed successfully and sent to kitchen!');
+
+    this.http.post(`${this.apiBase}/orders/create`, payload).subscribe({
+      next: () => {
+        alert("Order created!");
         this.clearSelection();
-        this.loadTables(); // refresh table availability
+        this.loadTables();
       },
-      error: (err) => {
-        console.error('❌ Error placing order:', err);
-        alert('Error placing order');
-      },
+      error: () => alert("Error placing order"),
       complete: () => (this.loading = false)
     });
   }
 
-  // ❌ Cancel and clear everything
+
+  /* ============================================================
+     CLEAR PANEL
+  ============================================================ */
   clearSelection() {
     this.selectedTable = null;
     this.categories = [];
     this.selectedCategory = null;
+
+    this.existingItems = [];
+    this.isContinuing = false;
+
     this.totalItems = 0;
     this.totalPrice = 0;
+
+    this.showExistingModal = false;
+  }
+
+  /* ============================================================
+     EXISTING ORDER MODAL
+  ============================================================ */
+
+  openExistingOrderModal() {
+    if (this.existingItems.length > 0) {
+      this.showExistingModal = true;
+    }
+  }
+
+  closeExistingOrderModal() {
+    this.showExistingModal = false;
+  }
+
+  calculateExistingOrderTotal(): string {
+    const total = this.existingItems.reduce((sum, e) => {
+      const qty = e.quantity;
+      const price = e.subTotal ? e.subTotal : e.price * qty;
+      return sum + price;
+    }, 0);
+
+    return total.toFixed(2);
   }
 }

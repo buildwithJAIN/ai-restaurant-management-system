@@ -1,1 +1,52 @@
-<p>billing works!</p>
+<app-loader [show]="loading"></app-loader>
+
+<div class="billing-container">
+
+    <h2>Active Billings 🧾</h2>
+
+    <div class="billing-grid">
+
+        <div class="bill-card" *ngFor="let b of billings">
+            <h3>Table {{ b.table.tableNumber }}</h3>
+
+            <p><strong>Orders:</strong> {{ b.orders.length }}</p>
+            <p><strong>Total:</strong> ${{ total(b) }}</p>
+
+            <button class="summary-btn" (click)="openSummary(b)">View Summary</button>
+        </div>
+
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-backdrop" *ngIf="showModal"></div>
+
+    <div class="billing-modal" *ngIf="showModal">
+
+        <h2>Billing Summary</h2>
+
+        <p><strong>Billing ID:</strong> {{ selectedBilling?.id }}</p>
+        <p><strong>Table:</strong> {{ selectedBilling?.table.tableNumber }}</p>
+        <p><strong>Total Orders:</strong> {{ selectedBilling?.orders.length }}</p>
+        <p><strong>Grand Total:</strong> ${{ total(selectedBilling) }}</p>
+
+        <p>
+            <strong>Status:</strong>
+            <span [ngClass]="selectedBilling?.canBill ? 'status-ok' : 'status-pending'">
+                {{ selectedBilling?.canBill ? 'All Orders Served' : 'Pending Orders' }}
+            </span>
+        </p>
+
+        <!-- PAYMENT METHOD -->
+        <div class="payment-section">
+            <label><input type="radio" [(ngModel)]="paymentMethod" value="Cash" /> Cash</label>
+            <label><input type="radio" [(ngModel)]="paymentMethod" value="Card" /> Card</label>
+        </div>
+
+        <button class="complete-btn" [disabled]="!selectedBilling?.canBill" (click)="completeBilling()">
+            Complete Billing
+        </button>
+
+        <button class="close-btn" (click)="closeModal()">Close</button>
+    </div>
+
+</div>

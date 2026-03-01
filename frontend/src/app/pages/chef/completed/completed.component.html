@@ -1,34 +1,36 @@
 <app-loader [show]="loading"></app-loader>
 
-<div class="completed-container">
-    <h2 class="page-title">Completed Orders ✅</h2>
+<div class="chef-header">
+    <h2>Completed Orders ✅</h2>
+    <p class="muted">Orders prepared and ready to serve</p>
+</div>
 
-    <div *ngIf="!loading && orders.length === 0" class="empty-state">
-        <p>No completed orders yet.</p>
-    </div>
+<div class="orders-grid" *ngIf="orders.length; else emptyState">
+    <div class="order-card" *ngFor="let o of orders">
+        <!-- Top section -->
+        <div class="top">
+            <div class="pill">Table {{ o.table?.tableNumber }}</div>
+            <div class="time">{{ o.createdAt | date: 'shortTime' }}</div>
+        </div>
 
-    <div class="order-grid" *ngIf="orders.length > 0">
-        <div class="order-card" *ngFor="let order of orders">
-            <div class="order-header">
-                <h3>Table {{ order.table?.tableNumber }}</h3>
-                <p class="waiter">👨‍🍳 Waiter: {{ order.waiter?.firstName }} {{ order.waiter?.lastName }}</p>
+        <!-- Scrollable items list -->
+        <div class="items">
+            <div class="row" *ngFor="let it of o.orderItems">
+                <img [src]="it.menuItem?.imageUrl || '/assets/no-image.png'" alt="{{ it.menuItem?.itemName }}" />
+                <div class="name">{{ it.menuItem?.itemName }}</div>
+                <div class="qty">x{{ it.quantity }}</div>
+                <div class="price">${{ it.subTotal | number: '1.2-2' }}</div>
             </div>
+        </div>
 
-            <div class="items-list">
-                <div class="item" *ngFor="let item of order.orderItems">
-                    <img [src]="item.menuItem?.imageUrl" alt="item" />
-                    <div class="info">
-                        <p class="name">{{ item.menuItem?.itemName }}</p>
-                        <p class="qty">Qty: {{ item.quantity }}</p>
-                        <p class="subtotal">Subtotal: ${{ item.subTotal.toFixed(2) }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="order-footer">
-                <p class="total">Total: ${{ order.totalAmount.toFixed(2) }}</p>
-                <span class="badge">Ready to Serve 🍽️</span>
-            </div>
+        <!-- Meta + badge -->
+        <div class="meta">
+            <span>👨‍🍳 Waiter: {{ o.waiter?.firstName }} {{ o.waiter?.lastName }}</span>
+            <span class="total">💰 Total: ${{ o.totalAmount | number: '1.2-2' }}</span>
         </div>
     </div>
 </div>
+
+<ng-template #emptyState>
+    <div class="empty">No completed orders yet.</div>
+</ng-template>

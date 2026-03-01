@@ -1,0 +1,25 @@
+<div class="host-container">
+    <h2>Front Desk Dashboard 🛎️</h2>
+
+    <div *ngIf="loading()">Loading reservations...</div>
+    <div *ngIf="error()">{{ error() }}</div>
+
+    <div *ngIf="!loading() && reservations().length === 0">
+        <p>No pending reservations.</p>
+    </div>
+
+    <div class="reservations-grid">
+        <div *ngFor="let r of reservations()" class="reservation-card">
+            <h3>{{ r.guestName }}</h3>
+            <p><strong>Phone:</strong> {{ r.phone }}</p>
+            <p><strong>People:</strong> {{ r.numPeople }}</p>
+            <p><strong>Date & Time:</strong> {{ r.dateTime | date:'short' }}</p>
+            <p><strong>Notes:</strong> {{ r.specialNotes || '-' }}</p>
+
+            <div class="actions">
+                <button (click)="updateReservation(r.id, 'Accepted')">✅ Accept</button>
+                <button (click)="updateReservation(r.id, 'Rejected')">❌ Reject</button>
+            </div>
+        </div>
+    </div>
+</div>

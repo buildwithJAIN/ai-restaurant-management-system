@@ -1,0 +1,218 @@
+.orders-container {
+    background: #fffaf6;
+    color: #5a3921;
+    font-family: 'Poppins', sans-serif;
+    padding: 1.5rem;
+    min-height: 100vh;
+    overflow: hidden;
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+
+        h2 {
+            color: #b85c38;
+            font-size: 26px;
+            font-weight: 700;
+        }
+    }
+
+    /* -------------------- GRID CONTAINER -------------------- */
+    .orders-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        height: calc(100vh - 150px);
+        overflow-y: auto;
+        padding-right: 6px;
+
+        &::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: #fff7f0;
+            border-radius: 10px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #ff8a3d, #e6732b);
+            border-radius: 10px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #e6732b, #c85c20);
+        }
+
+        scrollbar-color: #ff8a3d #fff7f0;
+        scrollbar-width: thin;
+    }
+
+    /* -------------------- ORDER CARD -------------------- */
+    .order-card {
+        background: #ffffff;
+        border: 1.5px solid #b85c38;
+        border-radius: 14px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 1rem;
+        transition: transform 0.2s ease-in-out;
+
+        &:hover {
+            transform: translateY(-4px);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+
+            h3 {
+                color: #8b4513;
+                font-weight: 700;
+                font-size: 1.1rem;
+            }
+
+            /* NEW BILLING BADGE */
+            .billing-tag {
+                background: #ffe8d9;
+                padding: 4px 10px;
+                border-radius: 8px;
+                color: #8b4513;
+                font-size: 0.8rem;
+                font-weight: 700;
+                border: 1px solid #ffb98a;
+            }
+        }
+
+        .order-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 0.95rem;
+
+            p {
+                margin: 0;
+            }
+        }
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.8rem;
+
+            .toggle-link {
+                color: #b85c38;
+                font-weight: 600;
+                text-decoration: underline;
+                cursor: pointer;
+
+                &:hover {
+                    color: #9c4f2f;
+                }
+            }
+        }
+    }
+
+    /* -------------------- FLOATING ITEM LIST -------------------- */
+    .floating-item-list {
+        background: #fffaf6;
+        border: 1.5px solid #f0d4be;
+        border-radius: 10px;
+        padding: 0.8rem;
+        margin-top: 0.6rem;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+        animation: fadeIn 0.3s ease-in-out;
+        overflow-y: auto;
+        max-height: 180px;
+
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #ff8a3d, #e6732b);
+            border-radius: 8px;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: #8b4513;
+
+            .close-btn {
+                background: transparent;
+                border: none;
+                font-size: 1.4rem;
+                cursor: pointer;
+                color: #b85c38;
+                font-weight: 700;
+                line-height: 1;
+
+                &:hover {
+                    color: #8b4513;
+                }
+            }
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #5a3921;
+            padding: 0.3rem 0;
+            border-bottom: 1px dashed #f3e0c0;
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            .item-name {
+                font-weight: 600;
+            }
+
+            .item-qty {
+                color: #8b5e34;
+            }
+
+            .item-price {
+                color: #b85c38;
+                font-weight: 700;
+            }
+        }
+    }
+
+    /* -------------------- EMPTY STATE -------------------- */
+    .empty {
+        background: #fffaf6;
+        border: 1px dashed #b85c38;
+        border-radius: 12px;
+        padding: 24px;
+        text-align: center;
+        color: #8b5e34;
+        font-size: 0.95rem;
+    }
+
+    /* -------------------- ANIMATIONS -------------------- */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}

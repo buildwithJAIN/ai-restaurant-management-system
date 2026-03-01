@@ -11,4 +11,8 @@ export class OrderService {
     createOrder(payload: any): Observable<any> {
         return this.http.post(`${this.baseUrl}/create`, payload);
     }
+    updateStatus(orderId: number, status: string) {
+        return this.http.put(`${this.baseUrl}/orders/${orderId}/status`, { status });
+    }
+
 }

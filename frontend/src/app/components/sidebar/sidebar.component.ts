@@ -23,6 +23,10 @@ export class SidebarComponent implements OnInit {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     this.role = user?.role || 'User';
     this.roleName = user?.firstName || 'User'
+    console.log(this.role)
+    this.role == "manager" ? this.router.navigate(['/manager/reports']) :
+      this.role == "Waiter" ? this.router.navigate(['/waiter/my-tables']) :
+        this.role == "Chef" ? this.router.navigate(['/chef/kitchen-queue']) : this.router.navigate(['/'])
     this.setMenuItems();
   }
 
@@ -41,10 +45,10 @@ export class SidebarComponent implements OnInit {
       case 'host':
         this.menuItems = [
           { label: 'Dashboard', route: '/host/dashboard', icon: 'dashboard' },
-          { label: 'Tables', route: '/host/tables', icon: 'tables' },
-          { label: 'Reservations', route: '/host/reservations', icon: 'reservations' },
-          { label: 'Reports', route: '/host/reports', icon: 'reports' },
-          { label: 'Settings', route: '/host/settings', icon: 'settings' },
+          // { label: 'Tables', route: '/host/tables', icon: 'tables' },
+          // { label: 'Reservations', route: '/host/reservations', icon: 'reservations' },
+          // { label: 'Reports', route: '/host/reports', icon: 'reports' },
+          // { label: 'Settings', route: '/host/settings', icon: 'settings' },
         ];
         break;
 
@@ -59,11 +63,10 @@ export class SidebarComponent implements OnInit {
 
       case 'manager':
         this.menuItems = [
-          { label: 'Dashboard', route: '/manager/dashboard', icon: 'dashboard' },
+          { label: 'Reports', route: '/manager/reports', icon: 'reports' },
           { label: 'Staff', route: '/manager/staffs', icon: 'staffs' },
           { label: 'Assign Tables', route: '/manager/assign-tables', icon: 'assignedtables' },
           { label: 'Menu Management', route: '/manager/menu-management', icon: 'menumanagement' },
-          { label: 'Reports', route: '/manager/reports', icon: 'reports' },
           { label: 'Settings', route: '/manager/settings', icon: 'settings' },
         ];
         break;

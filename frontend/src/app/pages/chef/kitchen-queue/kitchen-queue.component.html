@@ -8,30 +8,38 @@
 
 <div class="orders-grid" *ngIf="orders().length; else emptyState">
     <div class="order-card" *ngFor="let o of orders()">
+        <!-- Header -->
         <div class="top">
             <div class="pill">Table {{ o.table?.tableNumber }}</div>
-            <div class="time">{{ o.createdAt | date:'shortTime' }}</div>
+            <div class="time">{{ o.createdAt | date: 'shortTime' }}</div>
         </div>
 
+        <!-- Order Items -->
         <div class="items">
             <div class="row" *ngFor="let it of o.orderItems">
-                <span class="qty">x{{ it.quantity }}</span>
-                <span class="name">{{ it.menuItem?.itemName }}</span>
-                <span class="price">${{ it.subTotal | number:'1.2-2' }}</span>
+                <img [src]="it.menuItem?.imageUrl || '/assets/no-image.png'" alt="{{ it.menuItem?.itemName }}"
+                    class="item-image" />
+                <div class="details">
+                    <div class="name">{{ it.menuItem?.itemName }}</div>
+                    <div class="qty-price">
+                        <span class="qty">x{{ it.quantity }}</span>
+                        <span class="price">${{ it.subTotal | number: '1.2-2' }}</span>
+                    </div>
+                </div>
             </div>
         </div>
 
+        <!-- Meta Info -->
         <div class="meta">
-            <span>Waiter: {{ o.waiter?.firstName }} {{ o.waiter?.lastName }}</span>
-            <span class="total">Total: ${{ o.totalAmount | number:'1.2-2' }}</span>
+            <span>👨‍💼 Waiter: {{ o.waiter?.firstName }} {{ o.waiter?.lastName }}</span>
+            <span class="total">💰 Total: ${{ o.totalAmount | number: '1.2-2' }}</span>
         </div>
 
-        <button class="btn start" (click)="startCooking(o.id)">Start Cooking</button>
+        <!-- Button -->
+        <button class="btn start" (click)="startCooking(o.id)">🔥 Start Cooking</button>
     </div>
 </div>
 
 <ng-template #emptyState>
-    <div class="empty">
-        No pending orders right now.
-    </div>
+    <div class="empty">No pending orders right now.</div>
 </ng-template>

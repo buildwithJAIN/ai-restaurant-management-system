@@ -1,21 +1,42 @@
 <app-loader [show]="loading"></app-loader>
 
-<div class="settings-container">
-    <h2>Settings</h2>
+<div class="settings-page">
 
-    <div class="settings-card" (click)="openCategoryModal()">
-        <h3>📂 Category Master</h3>
-        <p>Manage categories for the menu</p>
+    <div class="settings-header">
+        <h2>Settings</h2>
+        <p class="subtitle">Manage categories, AI prompts, and automatic menu imports</p>
+    </div>
+
+    <div class="settings-grid">
+
+        <div class="settings-card" (click)="openCategoryModal()">
+            <div class="icon">📂</div>
+            <h3>Category Master</h3>
+            <p>Manage categories for the menu</p>
+        </div>
+
+        <!-- ITEM DESCRIPTION PROMPT -->
+        <div class="settings-card" (click)="openAIModal()">
+            <div class="icon">🤖</div>
+            <h3>AI Description Master</h3>
+            <p>Manage the AI prompt used for item descriptions</p>
+        </div>
+
+        <!-- MENU IMPORT PROMPT + PDF UPLOAD -->
+        <div class="settings-card" (click)="openPDFModal()">
+            <div class="icon">🧾</div>
+            <h3>AI Menu Import</h3>
+            <p>Upload PDFs and convert menus automatically</p>
+        </div>
+
     </div>
 </div>
 
-<!-- 🧾 Category Modal -->
+<!-- CATEGORY MODAL -->
 <div class="modal-overlay" *ngIf="showCategoryModal" (click)="closeModal()"></div>
-
 <div class="modal-content" *ngIf="showCategoryModal" (click)="$event.stopPropagation()">
     <h2 class="modal-title">Category Master</h2>
 
-    <!-- Top 1/3: Create/Edit -->
     <div class="create-section">
         <input type="text" placeholder="Enter category name" [(ngModel)]="categoryName" />
         <button (click)="saveCategory()">
@@ -25,7 +46,6 @@
 
     <hr />
 
-    <!-- Scrollable List -->
     <div class="category-list">
         <div class="category-item" *ngFor="let c of categories">
             <span>{{ c.name }}</span>
@@ -34,5 +54,59 @@
                 <i class="fa fa-trash delete" (click)="deleteCategory(c.id)"></i>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- ITEM DESCRIPTION PROMPT MODAL -->
+<div class="modal-overlay" *ngIf="showAIModal" (click)="closeAIModal()"></div>
+<div class="modal-content" *ngIf="showAIModal" (click)="$event.stopPropagation()">
+    <h2 class="modal-title">AI Description Master</h2>
+    <p class="muted">Prompt used to generate item descriptions</p>
+
+    <textarea rows="12" placeholder="Enter AI prompt..." [(ngModel)]="itemDescriptionPrompt">
+    </textarea>
+
+    <div class="modal-actions">
+        <button class="btn-cancel" (click)="closeAIModal()">Cancel</button>
+        <button class="btn-save" (click)="saveItemDescriptionPrompt()">Save Prompt</button>
+    </div>
+</div>
+
+<!-- PDF IMPORT MODAL -->
+<div class="modal-overlay" *ngIf="showPDFModal" (click)="closePDFModal()"></div>
+<div class="modal-content" *ngIf="showPDFModal" (click)="$event.stopPropagation()">
+
+    <h2 class="modal-title">AI Menu Import</h2>
+    <p class="muted">Upload a menu PDF and AI will extract structured JSON.</p>
+
+    <!-- MENU IMPORT PROMPT -->
+    <div class="prompt-block">
+        <label>AI Prompt for Menu Extraction</label>
+
+        <textarea rows="8" placeholder="Enter the AI prompt used to convert PDFs into JSON..." [(ngModel)]="menuPrompt">
+    </textarea>
+
+        <!-- ⭐ Add SAVE BUTTON -->
+        <button class="btn-save-light" (click)="saveMenuPrompt()">
+            Save Prompt
+        </button>
+    </div>
+
+
+    <!-- FILE UPLOAD -->
+    <div class="pdf-upload-box">
+        <input type="file" accept="application/pdf" (change)="onPDFSelected($event)" />
+
+        <button class="btn-save" (click)="uploadPDF()" [disabled]="!selectedPDF">
+            Upload & Generate Menu
+        </button>
+    </div>
+
+    <div class="import-result" *ngIf="importMessage">
+        <p>{{ importMessage }}</p>
+    </div>
+
+    <div class="modal-actions">
+        <button class="btn-cancel" (click)="closePDFModal()">Close</button>
     </div>
 </div>

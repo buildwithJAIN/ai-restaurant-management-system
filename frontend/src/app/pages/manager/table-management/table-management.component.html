@@ -3,33 +3,63 @@
 <!-- Header -->
 <div class="header">
     <h2>Table Management</h2>
-    <button class="create-btn" (click)="openModal()">+ Create Table</button>
+
+    <div class="actions">
+        <!-- REFRESH BUTTON -->
+        <button class="refresh-btn" (click)="refreshTables()" title="Refresh Tables">
+            <i class="fa fa-refresh"></i>
+        </button>
+
+        <!-- CREATE TABLE BUTTON -->
+        <button class="create-btn" (click)="openModal()">
+            + Create Table
+        </button>
+    </div>
 </div>
+
 
 <!-- Table List -->
 <div class="table-scroll">
-    <table class="data-table">
+    <table class="data-table center-table">
         <thead>
             <tr>
                 <th>Table #</th>
-                <th>Capacity</th>
-                <th>Available</th>
                 <th>Assigned Waiter</th>
+                <th>Capacity</th>
+                <th>Status</th>
+                <th>Available</th>
             </tr>
         </thead>
+
         <tbody>
-            <tr *ngFor="let t of tables()" (click)="onRowClick(t)">
+            <tr *ngFor="let t of tables()" (click)="t.status !== 'Occupied' && onRowClick(t)"
+                [class.disabled-row]="t.status === 'Occupied'">
+
+                <!-- Table Number -->
                 <td>{{ t.tableNumber }}</td>
+
+                <!-- Waiter Name -->
+                <td>{{ t.waiter?.firstName }} {{ t.waiter?.lastName }}</td>
+
+                <!-- Capacity -->
                 <td>{{ t.capacity }}</td>
+
+                <!-- Status -->
+                <td>
+                    <span class="table-status" [class.occupied]="t.status === 'Occupied'"
+                        [class.unoccupied]="t.status !== 'Occupied'">
+                        {{ t.status === 'Occupied' ? 'Occupied' : 'Unoccupied' }}
+                    </span>
+                </td>
+
+                <!-- Available -->
                 <td>
                     <span class="status" [class.available]="t.available" [class.unavailable]="!t.available">
                         {{ t.available ? 'Yes' : 'No' }}
                     </span>
                 </td>
-                <td>
-                    {{ t.waiter?.firstName }} {{ t.waiter?.lastName }}
-                </td>
             </tr>
+
         </tbody>
     </table>
 </div>

@@ -1,0 +1,337 @@
+<div class="reports-page">
+    <!-- Header -->
+    <div class="header">
+        <div>
+            <h2>Manager Reports</h2>
+            <p class="subtitle">Daily insights for your restaurant at a glance.</p>
+        </div>
+
+        <button class="refresh-btn" (click)="loadAllReports()">
+            <span class="icon">⟳</span>
+            Refresh Reports
+        </button>
+    </div>
+
+    <!-- Error Banner -->
+    <div class="error-banner" *ngIf="error()">
+        {{ error() }}
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" *ngIf="loading()">
+        <div class="spinner"></div>
+        <p>Crunching numbers...</p>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="reports-grid" [class.dimmed]="loading()">
+
+        <!-- ===========================
+         SECTION 1: SUMMARY
+    ============================ -->
+        <section class="section summary-section" *ngIf="summary() as s">
+
+            <div class="section-header">
+                <h3 class="section-title">Daily Summary</h3>
+
+                <button type="button" class="collapse-btn" (click)="toggleSection('summary')">
+                    <span class="collapse-icon" [class.collapsed]="!sectionExpanded.summary">▾</span>
+                </button>
+            </div>
+
+            <div class="section-body" [class.collapsed]="!sectionExpanded.summary">
+                <div class="cards-row">
+                    <div class="stat-card">
+                        <p class="label">Total Revenue</p>
+                        <p class="value">${{ s.totalRevenue | number:'1.2-2' }}</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <p class="label">Active Bills</p>
+                        <p class="value">{{ s.activeBills }}</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <p class="label">Closed Bills</p>
+                        <p class="value">{{ s.closedBills }}</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <p class="label">Orders Completed</p>
+                        <p class="value">{{ s.totalOrders }}</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <p class="label">Items Sold</p>
+                        <p class="value">{{ s.totalItemsSold }}</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <p class="label">Customers Served</p>
+                        <p class="value">{{ s.customerCount }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===========================
+         SECTION 2: SALES
+    ============================ -->
+        <section class="section sales-section" *ngIf="sales() as salesData">
+            <div class="section-header">
+                <div class="left" style="display: contents;">
+                    <h3 class="section-title">Sales & Items</h3>
+                    <span class="pill">
+                        Top Seller: {{ getTopItemName() }}
+                    </span>
+                </div>
+
+                <button type="button" class="collapse-btn" (click)="toggleSection('sales')">
+                    <span class="collapse-icon" [class.collapsed]="!sectionExpanded.sales">▾</span>
+                </button>
+            </div>
+
+            <div class="section-body" [class.collapsed]="!sectionExpanded.sales">
+                <div class="sales-layout">
+                    <!-- Item Sales Table -->
+                    <div class="card">
+                        <h4>Item-wise Sales</h4>
+                        <div class="table-wrapper" *ngIf="salesData.itemSales?.length; else noItems">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th style="text-align: center;">
+                                            <span class="sort-btn"
+                                                (click)="sortItemSales('quantitySold', 'asc')">▲</span>
+                                            Qty Sold
+                                            <span class="sort-btn"
+                                                (click)="sortItemSales('quantitySold', 'desc')">▼</span>
+                                        </th>
+
+                                        <th style="text-align: center;">
+                                            <span class="sort-btn" (click)="sortItemSales('revenue', 'asc')">▲</span>
+                                            Revenue
+                                            <span class="sort-btn" (click)="sortItemSales('revenue', 'desc')">▼</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let item of salesData.itemSales">
+                                        <td>{{ item.name }}</td>
+                                        <td style="text-align: center;">{{ item.quantitySold }}</td>
+                                        <td style="text-align: center;">${{ item.revenue | number:'1.2-2' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ng-template #noItems>
+                            <p class="empty-text">No item sales recorded for this period.</p>
+                        </ng-template>
+                    </div>
+
+                    <!-- Hourly Stats -->
+                    <div class="card">
+                        <h4>Hourly Performance</h4>
+                        <div class="table-wrapper" *ngIf="salesData.hourlyStats?.length; else noHours">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Hour</th>
+                                        <th style="text-align: center;">
+                                            <span class="sort-btn" (click)="sortHourly('orders', 'asc')">▲</span>
+                                            Orders
+                                            <span class="sort-btn" (click)="sortHourly('orders', 'desc')">▼</span>
+                                        </th>
+
+                                        <th style="text-align: center;">
+                                            <span class="sort-btn" (click)="sortHourly('revenue', 'asc')">▲</span>
+                                            Revenue
+                                            <span class="sort-btn" (click)="sortHourly('revenue', 'desc')">▼</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let h of salesData.hourlyStats">
+                                        <td>{{ h.label }}</td>
+                                        <td style="text-align: center;">{{ h.orders }}</td>
+                                        <td style="text-align: center;">${{ h.revenue | number:'1.2-2' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ng-template #noHours>
+                            <p class="empty-text">No hourly data available.</p>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===========================
+         SECTION 3: STAFF
+    ============================ -->
+        <section class="section staff-section" *ngIf="staff() as staffData">
+            <div class="section-header">
+                <div class="left" style="display: contents;">
+                    <h3 class="section-title">Staff Performance</h3>
+                    <span class="pill">
+                        {{ getWaiterTotal() }} Waiters · {{ getChefTotal() }} Chefs
+                    </span>
+                </div>
+
+                <button type="button" class="collapse-btn" (click)="toggleSection('staff')">
+                    <span class="collapse-icon" [class.collapsed]="!sectionExpanded.staff">▾</span>
+                </button>
+            </div>
+
+            <div class="section-body" [class.collapsed]="!sectionExpanded.staff">
+                <div class="staff-layout">
+                    <!-- Waiter Performance -->
+                    <div class="card">
+                        <h4>Waiters</h4>
+                        <div class="table-wrapper" *ngIf="staffData.waiters?.length; else noWaiters">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Waiter</th>
+                                        <th>Orders Taken</th>
+                                        <th>Orders Served</th>
+                                        <th>Revenue</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let w of staffData.waiters">
+                                        <td>{{ w.name }}</td>
+                                        <td>{{ w.ordersTaken }}</td>
+                                        <td>{{ w.ordersServed }}</td>
+                                        <td>${{ w.revenue | number:'1.2-2' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ng-template #noWaiters>
+                            <p class="empty-text">No waiter stats yet.</p>
+                        </ng-template>
+                    </div>
+
+                    <!-- Chef Performance -->
+                    <div class="card">
+                        <h4>Chefs</h4>
+                        <div class="table-wrapper" *ngIf="staffData.chefs?.length; else noChefs">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Chef</th>
+                                        <th>Orders Prepared</th>
+                                        <th>Items Cooked</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let c of staffData.chefs">
+                                        <td>{{ c.name }}</td>
+                                        <td>{{ c.ordersPrepared }}</td>
+                                        <td>{{ c.itemsCooked }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ng-template #noChefs>
+                            <p class="empty-text">No chef stats yet.</p>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===========================
+         SECTION 4: HISTORY & INVENTORY
+    ============================ -->
+        <section class="section history-section" *ngIf="history() as h">
+            <div class="section-header">
+                <div class="left" style="display: contents;">
+                    <h3 class="section-title">Billing & Inventory</h3>
+
+                    <div class="range-toggle">
+                        <button type="button" [class.active]="selectedRange() === 'today'"
+                            (click)="onRangeChange('today')">
+                            Today
+                        </button>
+                        <button type="button" [class.active]="selectedRange() === 'week'"
+                            (click)="onRangeChange('week')">
+                            This Week
+                        </button>
+                        <button type="button" [class.active]="selectedRange() === 'month'"
+                            (click)="onRangeChange('month')">
+                            This Month
+                        </button>
+                    </div>
+                </div>
+
+                <button type="button" class="collapse-btn" (click)="toggleSection('history')">
+                    <span class="collapse-icon" [class.collapsed]="!sectionExpanded.history">▾</span>
+                </button>
+            </div>
+
+            <div class="section-body" [class.collapsed]="!sectionExpanded.history">
+                <div class="history-layout">
+                    <!-- Billing History -->
+                    <div class="card">
+                        <h4>Billing History</h4>
+                        <div class="table-wrapper" *ngIf="h.billing?.length; else noBilling">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Billing ID</th>
+                                        <th>Table</th>
+                                        <th>Waiter</th>
+                                        <th>Total</th>
+                                        <th>Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let b of h.billing">
+                                        <td>#{{ b.billingId }}</td>
+                                        <td>{{ b.tableNumber }}</td>
+                                        <td>{{ b.waiterName }}</td>
+                                        <td>${{ b.totalAmount | number:'1.2-2' }}</td>
+                                        <td>{{ b.createdAt | date:'short' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ng-template #noBilling>
+                            <p class="empty-text">No billing records for this period.</p>
+                        </ng-template>
+                    </div>
+
+                    <!-- Inventory Usage -->
+                    <div class="card">
+                        <h4>Inventory Usage</h4>
+                        <div class="table-wrapper" *ngIf="h.inventory?.length; else noInventory">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Used Qty</th>
+                                        <th>Remaining</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let inv of h.inventory">
+                                        <td>{{ inv.name }}</td>
+                                        <td>{{ inv.usedQty }}</td>
+                                        <td>{{ inv.remainingStock }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ng-template #noInventory>
+                            <p class="empty-text">No inventory usage tracked for this period.</p>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

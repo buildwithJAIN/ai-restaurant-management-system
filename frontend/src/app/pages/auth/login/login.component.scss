@@ -1,10 +1,45 @@
-.login-container {
+/* 🔥 OUTER SPLIT LAYOUT (NEW) */
+.login-page {
+    display: flex;
     height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* 🔥 LEFT IMAGE SECTION – 2/3 WIDTH */
+.left-image {
+    flex: 2;
+    position: relative;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+/* 🔥 RIGHT LOGIN SECTION – 1/3 WIDTH */
+.right-side {
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     background: #fff8f0;
-    font-family: 'Poppins', sans-serif;
+    padding: 20px;
+}
+
+/* ------------------------- */
+/* ⭐ YOUR ORIGINAL STYLES ⭐ */
+/* ------------------------- */
+
+.login-container {
+    height: auto;
+    /* changed from 100vh to auto inside right-side */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }
 
 .login-card {
@@ -59,7 +94,6 @@
             border-radius: 10px;
             border-color: brown;
             background: #fff8f0;
-            // width: 100%;
             color: #b85c38;
             outline: none;
             transition: 0.2s;
@@ -74,7 +108,6 @@
             opacity: 0.3;
         }
     }
-
 
     button {
         margin-top: 10px;
@@ -100,7 +133,7 @@
     }
 }
 
-
+/* BUTTON OUTSIDE CARD */
 button {
     margin-top: 10px;
     background: #b85c38;
@@ -122,4 +155,21 @@ button {
     color: #b85c38;
     font-size: 13px;
     cursor: pointer;
+}
+
+/* 📱 RESPONSIVE – Hide Left Image on Mobile */
+@media (max-width: 900px) {
+    .login-page {
+        flex-direction: column;
+    }
+
+    .left-image {
+        display: none;
+    }
+
+    .right-side {
+        flex: none;
+        width: 100%;
+        padding: 40px 20px;
+    }
 }

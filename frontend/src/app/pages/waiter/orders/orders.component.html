@@ -1,1 +1,86 @@
-<p>orders works!</p>
+<app-loader [show]="loading"></app-loader>
+
+<div class="orders-container">
+
+    <div class="header">
+        <h2>My Orders 🧾</h2>
+    </div>
+
+    <!-- ======================= ORDER LIST ======================= -->
+    <div class="orders-grid" *ngIf="orders.length > 0; else noOrders">
+
+        <div class="order-wrapper" *ngFor="let order of orders">
+
+            <!-- ===================== ORDER CARD ===================== -->
+            <div class="order-card">
+
+                <div class="order-header">
+                    <h3>
+                        Table {{ order.table?.tableNumber }}
+                    </h3>
+
+                    <!-- Billing ID -->
+                    <span class="billing-tag">
+                        Bill #{{ order.billingId || '—' }}
+                    </span>
+                </div>
+
+                <div class="order-body">
+
+                    <!-- Total items -->
+                    <p>
+                        <strong>Total Items:</strong>
+                        {{ order.orderItems.length }}
+                    </p>
+
+                    <!-- Total amount -->
+                    <p>
+                        <strong>Total Amount:</strong>
+                        ${{ order.totalAmount.toFixed(2) }}
+                    </p>
+
+                    <!-- Chef (if assigned) -->
+                    <p>
+                        <strong>Chef:</strong>
+                        {{ order.chef?.firstName || '—' }}
+                    </p>
+
+                </div>
+
+                <!-- ===================== FOOTER ===================== -->
+                <div class="order-footer">
+                    <a href="javascript:void(0)" class="toggle-link" (click)="toggleItems(order.id)">
+                        {{ expandedCards[order.id] ? 'Hide Items' : 'View Items' }}
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- ================== FLOATING ITEM LIST ================== -->
+            <div class="floating-item-list" *ngIf="expandedCards[order.id]">
+
+                <div class="item-header">
+                    <strong>Items ({{ order.orderItems.length }})</strong>
+                    <button class="close-btn" (click)="toggleItems(order.id)">×</button>
+                </div>
+
+                <div *ngFor="let item of order.orderItems" class="item-row">
+                    <span class="item-name">{{ item.menuItem?.itemName }}</span>
+                    <span class="item-qty">x{{ item.quantity }}</span>
+                    <span class="item-price">${{ item.subTotal.toFixed(2) }}</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ======================= NO ORDERS ======================= -->
+    <ng-template #noOrders>
+        <div class="empty">
+            <p>No orders placed yet.</p>
+        </div>
+    </ng-template>
+
+</div>

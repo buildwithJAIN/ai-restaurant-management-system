@@ -6,6 +6,7 @@ import { MenuService } from '../../../services/menu.services';
 import { MenuItem } from '../../../models/menu-Item.model';
 import { RouterModule } from '@angular/router';
 import { LoaderComponent } from '../../../components/loader/loader.component';
+import { AIService } from '../../../services/ai.service';
 
 @Component({
   selector: 'app-menu-management',
@@ -18,7 +19,7 @@ export class MenuManagementComponent implements OnInit {
   private fb = inject(FormBuilder);
   private menuSvc = inject(MenuService);
   private http = inject(HttpClient);
-
+  private aiSvc = inject(AIService)
   items = signal<MenuItem[]>([]);
   loading = signal<boolean>(false);
   showModal = signal<boolean>(false);
@@ -51,19 +52,22 @@ export class MenuManagementComponent implements OnInit {
 
   // ✅ Load existing menu items
   fetch() {
-    this.loader = true;
-    this.loading.set(true);
+    this.loader = true
     this.menuSvc.list().subscribe({
       next: (list) => {
-        this.items.set(list);
+        console.log('✅ Menu list:', list);
+        this.items.set(list || []);
         this.loading.set(false);
       },
-      error: () => this.loading.set(false),
+      error: (err) => {
+        console.error('❌ Error fetching menu items:', err);
+      },
       complete: () => {
-        this.loader = false;
+        this.loader = false
       },
     });
   }
+
 
   // ✅ Load categories dynamically
   loadCategories() {
@@ -201,4 +205,38 @@ export class MenuManagementComponent implements OnInit {
       next: () => this.items.update((arr) => arr.filter((i) => i.id !== item.id)),
     });
   }
+
+  generateWithAI() {
+    const name = this.form.get('itemName')?.value?.trim();
+    const category = this.form.get('category')?.value?.trim();
+    const imageUrl = this.form.get('imageUrl')?.value?.trim(); // or however you store it
+
+    if (!name || !category) {
+      alert('Please enter both Item Name and Category first.');
+      return;
+    }
+
+    // Ask if image should be used
+    const includeImage = confirm('Do you want to include the image in AI generation?');
+
+    this.loading.set(true);
+
+    this.aiSvc.generateDescription({
+      name,
+      category,
+      imageUrl: includeImage ? imageUrl : null
+    }).subscribe({
+      next: (res) => {
+        this.form.patchValue({ description: res.description });
+        alert('✅ Description generated successfully!');
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('❌ AI generation failed:', err);
+        alert('AI generation failed.');
+        this.loading.set(false);
+      },
+    });
+  }
+
 }

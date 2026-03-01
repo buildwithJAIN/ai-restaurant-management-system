@@ -24,7 +24,7 @@ const upload = multer({ storage });
 
 // Get all menu items
 router.get("/", async (req, res) => {
-  const items = await prisma.menuItem.findMany({ orderBy: { createdAt: "desc" } });
+  const items = await prisma.menuItem.findMany({ where:{available:true},orderBy: { createdAt: "desc" } });
   res.json(items);
 });
 
@@ -59,11 +59,17 @@ router.post("/", upload.single("image"), async (req, res) => {
 router.put("/:id", upload.single("image"), async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const { itemName, category, price, totalAvailable, description, available } = req.body;
-    // const imageUrl = req.file ? `/uploads/${req.file.filename}` : req.body.imageUrl;
-    const imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
-        console.log(imageUrl)
+    const { itemName, category, price, totalAvailable, description, available, imageUrl: oldImage } = req.body;
 
+    let imageUrl;
+
+    // If user uploaded a new image → use it
+    if (req.file) {
+      imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
+    } else {
+      // No new image uploaded → use existing one
+      imageUrl = oldImage;
+    }
 
     const updated = await prisma.menuItem.update({
       where: { id },
@@ -84,6 +90,7 @@ router.put("/:id", upload.single("image"), async (req, res) => {
     res.status(500).json({ message: "Error updating menu item" });
   }
 });
+
 
 // Delete menu item
 router.delete("/:id", async (req, res) => {

@@ -1,1 +1,56 @@
-<p>ready works!</p>
+<div class="chef-header">
+    <h2>Ready to Serve 🍽️</h2>
+    <p class="muted">Items prepared by the kitchen and waiting to be served</p>
+</div>
+
+<div class="orders-grid" *ngIf="orders.length; else emptyState">
+
+    <div class="order-card" *ngFor="let o of orders">
+
+        <div class="top">
+            <div class="pill">Table {{ o.table?.tableNumber }}</div>
+            <div class="time">{{ o.createdAt | date:'shortTime' }}</div>
+        </div>
+
+        <!-- READY ITEMS WITH CHECKBOXES -->
+        <div class="items">
+            <div class="row" *ngFor="let it of o.orderItems">
+
+                <input type="checkbox" [(ngModel)]="it.selected" class="item-check" />
+
+                <img [src]="it.menuItem?.imageUrl || '/assets/no-image.png'" alt="item" />
+
+                <div class="name">{{ it.menuItem?.itemName }}</div>
+
+                <div class="qty">x{{ it.quantity }}</div>
+
+                <div class="price">
+                    ${{ it.subTotal | number:'1.2-2' }}
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ORDER META INFO -->
+        <div class="meta">
+            <span>👨‍🍳 Chef: {{ o.chef?.firstName }}</span>
+            <span class="total">💰 Total: ${{ o.totalAmount | number:'1.2-2' }}</span>
+        </div>
+
+        <!-- SERVE SELECTED ITEMS BUTTON -->
+        <button class="btn ready" (click)="askMarkServed(o)">
+            🍽️ Serve Selected Items
+        </button>
+
+    </div>
+</div>
+
+<!-- EMPTY STATE -->
+<ng-template #emptyState>
+    <div class="empty">No ready items right now.</div>
+</ng-template>
+
+<!-- CONFIRM MODAL -->
+<app-confirm-modal [visible]="showConfirm" title="Serve Selected Items?"
+    message="These items will be marked as served. Proceed?" (onConfirm)="handleConfirm($event)">
+</app-confirm-modal>

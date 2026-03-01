@@ -157,6 +157,7 @@ body {
     max-width: 650px;
     width: 95%;
     animation: popIn 0.3s ease-out;
+    height: 650px;
 }
 
 .modal-header {
@@ -368,5 +369,82 @@ select {
 
     &:focus {
         border-color: #ff8a3d;
+    }
+}
+
+/* --- Description Section --- */
+.description-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+textarea {
+    width: 100%;
+    min-height: 100px;
+    max-height: 160px;
+    /* prevent overflow outside modal */
+    border: 1px solid #d1b6a2;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #5a3a2b;
+    background: #fffaf2;
+    resize: none;
+    /* 🔹 disables manual vertical expansion */
+    overflow-y: auto;
+    box-sizing: border-box;
+
+    /* Scrollbar theming */
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f0e2d3;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: #b66a32;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: #a55e29;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: #b66a32;
+        box-shadow: 0 0 0 2px rgba(182, 106, 50, 0.25);
+    }
+}
+
+/* --- AI Button --- */
+.btn-ai {
+    align-self: center;
+    background: #b66a32;
+    color: #fffaf2;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 6px;
+    width: 100%;
+    transition: all 0.25s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+
+    &:hover {
+        background: #a15c28;
+        transform: translateY(-1px);
+    }
+
+    &:disabled {
+        background: #c9a17f;
+        cursor: not-allowed;
     }
 }

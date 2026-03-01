@@ -1,36 +1,57 @@
 <app-loader [show]="loading"></app-loader>
 
-<div class="in-progress-container">
-    <h2 class="page-title">In-Progress Orders 🍽️</h2>
+<div class="chef-header">
+    <h2>In-Progress Orders 🍽️</h2>
+    <p class="muted">Currently being prepared</p>
+</div>
 
-    <div *ngIf="!loading && orders.length === 0" class="empty-state">
-        <p>No active orders right now.</p>
-    </div>
+<div class="orders-grid" *ngIf="orders.length; else emptyState">
 
-    <div class="order-grid" *ngIf="orders.length > 0">
-        <div class="order-card" *ngFor="let order of orders">
-            <div class="order-header">
-                <h3>Table {{ order.table?.tableNumber }}</h3>
-                <p class="waiter">
-                    👨‍🍳 Waiter: {{ order.waiter?.firstName }} {{ order.waiter?.lastName }}
-                </p>
-            </div>
+    <div class="order-card" *ngFor="let o of orders">
 
-            <div class="items-list">
-                <div class="item" *ngFor="let item of order.orderItems">
-                    <img [src]="item.menuItem?.imageUrl" alt="item" />
-                    <div class="info">
-                        <p class="name">{{ item.menuItem?.itemName }}</p>
-                        <p class="qty">Qty: {{ item.quantity }}</p>
-                        <p class="subtotal">Subtotal: ${{ item.subTotal.toFixed(2) }}</p>
-                    </div>
+        <div class="top">
+            <div class="pill">Table {{ o.table?.tableNumber }}</div>
+            <div class="time">{{ o.createdAt | date:'shortTime' }}</div>
+        </div>
+
+        <!-- ITEMS WITH CHECKBOXES -->
+        <div class="items">
+            <div class="row" *ngFor="let it of o.orderItems">
+
+                <input type="checkbox" [(ngModel)]="it.selected" class="item-check" />
+
+                <img [src]="it.menuItem?.imageUrl || '/assets/no-image.png'" alt="item" />
+
+                <div class="name">{{ it.menuItem?.itemName }}</div>
+
+                <div class="qty">x{{ it.quantity }}</div>
+
+                <div class="price">
+                    ${{ it.subTotal | number:'1.2-2' }}
                 </div>
             </div>
-
-            <div class="order-footer">
-                <p class="total">Total: ${{ order.totalAmount.toFixed(2) }}</p>
-                <button class="ready-btn" (click)="markReady(order.id)">✅ Mark Ready</button>
-            </div>
         </div>
+
+        <!-- META DETAILS -->
+        <div class="meta">
+            <span>👨‍🍳 Waiter: {{ o.waiter?.firstName }} {{ o.waiter?.lastName }}</span>
+            <span class="total">💰 Total: ${{ o.totalAmount | number:'1.2-2' }}</span>
+        </div>
+
+        <!-- MARK READY BUTTON NOW HANDLES ITEM SELECTION -->
+        <button class="btn ready" (click)="askMarkReady(o)">
+            ✅ Mark Selected Ready
+        </button>
+
     </div>
 </div>
+
+<!-- EMPTY STATE -->
+<ng-template #emptyState>
+    <div class="empty">No active orders right now.</div>
+</ng-template>
+
+<!-- CONFIRMATION MODAL -->
+<app-confirm-modal [visible]="showConfirm" title="Mark Selected Items Ready?"
+    message="These items will be marked as prepared. Proceed?" (onConfirm)="handleConfirm($event)">
+</app-confirm-modal>
