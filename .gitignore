@@ -1,5 +1,5 @@
 # ==================================================
-# GLOBAL (applies everywhere)
+# GLOBAL
 # ==================================================
 
 # Node dependencies
@@ -16,6 +16,8 @@ yarn-error.log*
 .env
 .env.*
 *.local
+backend/.env
+frontend/.env
 
 # OS files
 .DS_Store
@@ -37,7 +39,7 @@ frontend/.cache/
 frontend/tmp/
 frontend/out-tsc/
 
-# Angular environment files (if used for secrets)
+# Angular environment files
 frontend/src/environments/environment*.ts
 
 # ==================================================
@@ -48,7 +50,7 @@ backend/dist/
 backend/tmp/
 backend/uploads/
 backend/coverage/
-backend/uploads/
+
 # Prisma generated files
 backend/.prisma/
 backend/generated/
@@ -56,8 +58,6 @@ backend/generated/
 # Local Prisma DB (if SQLite used)
 backend/prisma/dev.db
 backend/prisma/dev.db-journal
-
-
 
 # ==================================================
 # Build artifacts
